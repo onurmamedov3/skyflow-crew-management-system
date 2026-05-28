@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record CrewResponse(
 		UUID id,
-		UUID employeeId,
+		String employeeId,
 		String firstName,
 		String lastName,
 		CrewRole role,
@@ -18,5 +18,4 @@ public record CrewResponse(
 		Integer totalFlightHours,
 		LocalDateTime lastFlightEnd
 ) {
-
 }

@@ -8,6 +8,7 @@ import java.util.UUID;
 public record FlightResponse(
 		UUID id,
 		String flightNumber,
+		UUID aircraftId,
 		String departureAirport,
 		String destinationAirport,
 		FlightStatus status,

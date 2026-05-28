@@ -12,6 +12,7 @@ public record NotificationResponse(
 		NotificationSeverity severity,
 		String message,
 		boolean isRead,
-		LocalDateTime createdAt
+		LocalDateTime createdAt,
+		String title
 ) {
 }
