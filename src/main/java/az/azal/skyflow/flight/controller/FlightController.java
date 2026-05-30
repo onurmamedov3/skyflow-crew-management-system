@@ -19,7 +19,7 @@ public class FlightController {
 
 	private final FlightService service;
 
-	@GetMapping("/{flightNumber}}")
+	@GetMapping("/{flightNumber}")
 	public ResponseEntity<FlightResponse> getByFlightNumber(@PathVariable String flightNumber){
 		return ResponseEntity.ok(service.getByFlightNumber(flightNumber));
 	}
