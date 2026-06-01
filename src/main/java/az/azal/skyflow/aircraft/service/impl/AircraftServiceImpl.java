@@ -7,7 +7,7 @@ import az.azal.skyflow.aircraft.model.Aircraft;
 import az.azal.skyflow.aircraft.model.AircraftStatus;
 import az.azal.skyflow.aircraft.repository.AircraftRepository;
 import az.azal.skyflow.aircraft.service.AircraftService;
-import az.azal.skyflow.common.exception.custom.ResourceAlreadyExistsException;
+import az.azal.skyflow.common.exception.custom.DuplicateResourceException;
 import az.azal.skyflow.common.exception.custom.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class AircraftServiceImpl implements AircraftService {
     @Transactional(readOnly = true)
     public AircraftResponse getByRegistrationNumber(String registrationNumber) {
         Aircraft aircraft = aircraftRepository.findByRegistrationNumber(registrationNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Aircraft not found"));
+                .orElseThrow(() -> ResourceNotFoundException.byField("Aircraft", "registrationNumber", registrationNumber));
 
         return aircraftMapper.toResponse(aircraft);
     }
@@ -46,7 +46,7 @@ public class AircraftServiceImpl implements AircraftService {
     public AircraftResponse create(AircraftRequest request) {
 
         if (aircraftRepository.existsByRegistrationNumber(request.registrationNumber())) {
-            throw new ResourceAlreadyExistsException("Aircraft already exists");
+            throw DuplicateResourceException.byField("Aircraft", "registrationNumber", request.registrationNumber());
         }
 
         Aircraft aircraft = aircraftMapper.toEntity(request);
@@ -58,7 +58,7 @@ public class AircraftServiceImpl implements AircraftService {
     @Transactional
     public AircraftResponse update(String registrationNumber, AircraftRequest request) {
         Aircraft aircraft = aircraftRepository.findByRegistrationNumber(registrationNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Aircraft not found"));
+                .orElseThrow(() -> ResourceNotFoundException.byField("Aircraft", "registrationNumber", registrationNumber));
 
         aircraftMapper.updateEntity(request, aircraft);
 
@@ -70,7 +70,7 @@ public class AircraftServiceImpl implements AircraftService {
     @Override
     public AircraftResponse delete(String registrationNumber) {
         Aircraft aircraft = aircraftRepository.findByRegistrationNumber(registrationNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Aircraft not found"));
+                .orElseThrow(() -> ResourceNotFoundException.byField("Aircraft", "registrationNumber", registrationNumber));
 
         aircraft.setStatus(AircraftStatus.RETIRED);
         aircraftRepository.save(aircraft);

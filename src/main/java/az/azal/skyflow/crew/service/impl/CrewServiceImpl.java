@@ -1,7 +1,7 @@
 package az.azal.skyflow.crew.service.impl;
 
 
-import az.azal.skyflow.common.exception.custom.ResourceAlreadyExistsException;
+import az.azal.skyflow.common.exception.custom.DuplicateResourceException;
 import az.azal.skyflow.common.exception.custom.ResourceNotFoundException;
 import az.azal.skyflow.crew.dto.CrewRequest;
 import az.azal.skyflow.crew.dto.CrewResponse;
@@ -27,7 +27,8 @@ public class CrewServiceImpl implements CrewService {
 	@Override
 	@Transactional
 	public CrewResponse getCrewByEmployeeId(String employeeId) {
-		CrewMember crewMember = repository.findByEmployeeId(employeeId).orElseThrow(() -> new ResourceNotFoundException("Aircraft not found"));
+		CrewMember crewMember = repository.findByEmployeeId(employeeId)
+				.orElseThrow(() -> ResourceNotFoundException.byField("CrewMember", "employeeId", employeeId));
 		return crewMapper.toResponse(crewMember);
 	}
 
@@ -46,7 +47,7 @@ public class CrewServiceImpl implements CrewService {
 	public CrewResponse create(CrewRequest request) {
 
 		if(repository.existsByEmployeeId(request.employeeId())){
-			throw new ResourceAlreadyExistsException("Crew member already exists");
+			throw DuplicateResourceException.byField("CrewMember", "employeeId", request.employeeId());
 		}
 
 		CrewMember crewMember = crewMapper.toEntity(request);
@@ -60,7 +61,7 @@ public class CrewServiceImpl implements CrewService {
 	@Transactional
 	public CrewResponse update(String employeeId, CrewRequest request) {
 		CrewMember crewMember = repository.findByEmployeeId(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Crew member not found"));
+				.orElseThrow(() -> ResourceNotFoundException.byField("CrewMember", "employeeId", employeeId));
 
 		crewMapper.updateEntity(request, crewMember);
 
@@ -72,7 +73,7 @@ public class CrewServiceImpl implements CrewService {
 	@Override
 	public CrewResponse delete(String employeeId) {
 		CrewMember crewMember = repository.findByEmployeeId(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Crew member not found"));
+				.orElseThrow(() -> ResourceNotFoundException.byField("CrewMember", "employeeId", employeeId));
 
 		crewMember.setStatus(CrewStatus.INACTIVE);
 

@@ -1,6 +1,6 @@
 package az.azal.skyflow.flight.service.impl;
 
-import az.azal.skyflow.common.exception.custom.ResourceAlreadyExistsException;
+import az.azal.skyflow.common.exception.custom.DuplicateResourceException;
 import az.azal.skyflow.common.exception.custom.ResourceNotFoundException;
 import az.azal.skyflow.flight.dto.FlightRequest;
 import az.azal.skyflow.flight.dto.FlightResponse;
@@ -28,9 +28,8 @@ public class FlightServiceImpl implements FlightService {
 	public FlightResponse getByFlightNumber(String flightNumber) {
 		return repository.findByFlightNumber(flightNumber)
 				.map(flightMapper::toResponse)
-				.orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
+				.orElseThrow(() -> ResourceNotFoundException.byField("Flight", "flightNumber", flightNumber));
 	}
-
 
 	@Override
 	@Transactional
@@ -46,7 +45,7 @@ public class FlightServiceImpl implements FlightService {
 	public FlightResponse create(FlightRequest request) {
 
 		if(repository.existsByFlightNumber(request.flightNumber())){
-			throw new ResourceAlreadyExistsException("Flight already exists");
+			throw DuplicateResourceException.byField("Flight", "flightNumber", request.flightNumber());
 		}
 		Flight flight = flightMapper.toEntity(request);
 		repository.save(flight);
@@ -56,7 +55,7 @@ public class FlightServiceImpl implements FlightService {
 	@Override
 	public FlightResponse update(String flightNumber, FlightRequest request) {
 		Flight flight = repository.findByFlightNumber(flightNumber)
-				.orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
+				.orElseThrow(() -> ResourceNotFoundException.byField("Flight", "flightNumber", flightNumber));
 
 		flightMapper.updateEntity(request, flight);
 
@@ -68,7 +67,7 @@ public class FlightServiceImpl implements FlightService {
 	@Override
 	public FlightResponse delete(String flightNumber) {
 		Flight flight = repository.findByFlightNumber(flightNumber)
-				.orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
+				.orElseThrow(() -> ResourceNotFoundException.byField("Flight", "flightNumber", flightNumber));
 
 		flight.setStatus(FlightStatus.CANCELLED);
 		repository.save(flight);
