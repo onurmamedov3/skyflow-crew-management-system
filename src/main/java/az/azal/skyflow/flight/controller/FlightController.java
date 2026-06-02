@@ -2,6 +2,7 @@ package az.azal.skyflow.flight.controller;
 
 import az.azal.skyflow.flight.dto.FlightRequest;
 import az.azal.skyflow.flight.dto.FlightResponse;
+import az.azal.skyflow.flight.model.FlightStatus;
 import az.azal.skyflow.flight.service.FlightService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,11 @@ public class FlightController {
 	public ResponseEntity<Void> delete(@PathVariable String flightNumber) {
 		service.delete(flightNumber);
 		return ResponseEntity.noContent().build();
+	}
+
+	@PatchMapping("/{flightNumber}/status")
+	public ResponseEntity<FlightResponse> changeStatus(@PathVariable String flightNumber, @RequestParam FlightStatus newStatus, @RequestParam String changeReason) {
+		FlightResponse response = service.changeStatus(flightNumber, newStatus, changeReason);
+		return ResponseEntity.ok(response);
 	}
 }

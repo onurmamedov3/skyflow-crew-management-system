@@ -1,6 +1,5 @@
 package az.azal.skyflow.flight.dto;
 
-import az.azal.skyflow.flight.model.FlightStatus;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
@@ -34,10 +33,5 @@ public record FlightRequest(
 		String gateNumber,
 
 		@NotNull(message = "Aircraft is required")
-		UUID aircraftId,
-
-		@NotNull(message = "Flight status is required")
-		FlightStatus status
-
-) {
-}
+		UUID aircraftId
+) {}

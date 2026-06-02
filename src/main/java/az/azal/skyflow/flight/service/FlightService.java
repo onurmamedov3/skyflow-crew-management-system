@@ -2,7 +2,7 @@ package az.azal.skyflow.flight.service;
 
 import az.azal.skyflow.flight.dto.FlightRequest;
 import az.azal.skyflow.flight.dto.FlightResponse;
-import jakarta.validation.Valid;
+import az.azal.skyflow.flight.model.FlightStatus;
 
 import java.util.List;
 
@@ -13,7 +13,9 @@ public interface FlightService {
 
 	FlightResponse create(FlightRequest request);
 
-	FlightResponse update(String flightNumber, @Valid FlightRequest request);
+	FlightResponse update(String flightNumber, FlightRequest request);
 
 	FlightResponse delete(String flightNumber);
+
+	FlightResponse changeStatus(String flightNumber, FlightStatus newStatus, String changeReason);
 }

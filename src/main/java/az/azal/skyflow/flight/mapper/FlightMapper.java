@@ -40,6 +40,7 @@ public interface FlightMapper {
 	@Mapping(target = "actualDepartureTime", ignore = true)
 	@Mapping(target = "actualArrivalTime", ignore = true)
 	@Mapping(target = "sequenceOrder", ignore = true)
+	@Mapping(target = "status", ignore = true)
 	void updateEntity(FlightRequest request, @MappingTarget Flight entity);
 
 }

@@ -2,7 +2,6 @@ package az.azal.skyflow.crew.service;
 
 import az.azal.skyflow.crew.dto.CrewRequest;
 import az.azal.skyflow.crew.dto.CrewResponse;
-import jakarta.validation.Valid;
 
 import java.util.List;
 

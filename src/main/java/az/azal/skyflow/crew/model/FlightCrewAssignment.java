@@ -13,7 +13,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "flight_crew_assignment")
+@Table(name = "flight_crew_assignment", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"flight_id", "crew_member_id"})
+}) //eyni ucus ucun eyni ekipajin iki defe teyin olunmasi DB sevviyesinde bloklanir
+
 public class FlightCrewAssignment {
 
     @Id
