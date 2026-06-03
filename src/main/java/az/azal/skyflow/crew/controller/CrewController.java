@@ -5,11 +5,11 @@ import az.azal.skyflow.crew.dto.CrewResponse;
 import az.azal.skyflow.crew.service.CrewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/crew")
@@ -24,8 +24,8 @@ public class CrewController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<CrewResponse>> getAllCrew() {
-		return ResponseEntity.ok(service.getAll());
+	public ResponseEntity<Page<CrewResponse>> getAll(Pageable pageable) {
+		return ResponseEntity.ok(service.getAll(pageable));
 	}
 
 	@PostMapping

@@ -14,12 +14,12 @@ import az.azal.skyflow.flight.model.FlightStatusHistory;
 import az.azal.skyflow.flight.repository.FlightRepository;
 import az.azal.skyflow.flight.repository.FlightStatusHistoryRepository;
 import az.azal.skyflow.flight.service.FlightService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,11 +49,10 @@ public class FlightServiceImpl implements FlightService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<FlightResponse> getAll() {
-		return flightRepository.findAll()
-				.stream()
-				.map(flightMapper::toResponse)
-				.toList();
+	public Page<FlightResponse> getAll(Pageable pageable) {
+		return flightRepository.findAll(pageable)
+				.map(flightMapper::toResponse);
+
 	}
 
 	@Override

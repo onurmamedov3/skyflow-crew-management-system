@@ -2,13 +2,13 @@ package az.azal.skyflow.crew.service;
 
 import az.azal.skyflow.crew.dto.CrewRequest;
 import az.azal.skyflow.crew.dto.CrewResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CrewService {
 	CrewResponse getCrewByEmployeeId(String employeeId);
 
-	List<CrewResponse> getAll();
+	Page<CrewResponse> getAll(Pageable pageable);
 
 	CrewResponse create(CrewRequest request);
 

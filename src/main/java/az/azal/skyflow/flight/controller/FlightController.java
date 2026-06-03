@@ -6,11 +6,11 @@ import az.azal.skyflow.flight.model.FlightStatus;
 import az.azal.skyflow.flight.service.FlightService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/flight")
@@ -25,8 +25,8 @@ public class FlightController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<FlightResponse>> getAll(){
-		return ResponseEntity.ok(service.getAll());
+	public ResponseEntity<Page<FlightResponse>> getAll(Pageable pageable){
+		return ResponseEntity.ok(service.getAll(pageable));
 	}
 
 	@PostMapping
