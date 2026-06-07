@@ -92,7 +92,7 @@ public class CrewServiceImpl implements CrewService {
 
 		long flightMinutes = Duration.between(actualDepartureTime, flight.getActualArrivalTime()).toMinutes();
 
-		crewMember.setTotalFlightHours(crewMember.getTotalFlightHours() + (int) flightMinutes / 60);
+		crewMember.setTotalFlightMinutes(crewMember.getTotalFlightMinutes() + (int) flightMinutes);
 
 		repository.save(crewMember);
 

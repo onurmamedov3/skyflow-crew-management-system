@@ -44,10 +44,8 @@ public class FlightCompletionServiceImpl implements FlightCompletionService {
 		Flight flight = flightRepository.findById(flightId)
 				.orElseThrow(() -> ResourceNotFoundException.byId("Flight", flightId));
 
-		validateStatusTransition(flight.getStatus(), FlightStatus.ARRIVED);
-
 		flight.setActualArrivalTime(LocalDateTime.now());
-		flightStatusService.changeFlightStatus(flight, FlightStatus.ARRIVED, completedBy);
+		flightStatusService.changeFlightStatus(flight, FlightStatus.ARRIVED, completedBy, "Flight completed");
 
 		Aircraft aircraft = flight.getAircraft();
 		if (aircraft != null) {
@@ -66,11 +64,5 @@ public class FlightCompletionServiceImpl implements FlightCompletionService {
 		//	notification will be written in the future after the notification service is implemented
 
 		return flightMapper.toResponse(flight);
-	}
-
-	private void validateStatusTransition(FlightStatus currentStatus, FlightStatus newStatus) {
-		if (currentStatus != FlightStatus.IN_FLIGHT) {
-			throw BusinessRuleViolationException.invalidStatusTransition(currentStatus.toString(), newStatus.toString());
-		}
 	}
 }

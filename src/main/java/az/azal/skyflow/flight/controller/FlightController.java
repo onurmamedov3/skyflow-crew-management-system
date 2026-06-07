@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/flight")
+@RequestMapping("/api/v1/flights")
 @RequiredArgsConstructor
 public class FlightController {
 

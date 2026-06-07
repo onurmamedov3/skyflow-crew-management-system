@@ -28,7 +28,7 @@ public interface CrewMapper {
 	@Mapping(target = "updatedAt", ignore = true)
 	@Mapping(target = "version", ignore = true)
 	@Mapping(target = "lastFlightEnd", ignore = true)
-	@Mapping(target = "totalFlightHours", ignore = true)
+	@Mapping(target = "totalFlightMinutes", ignore = true)
 	@Mapping(target = "status", ignore = true)
 	CrewMember toEntity(CrewRequest request);
 
@@ -37,7 +37,7 @@ public interface CrewMapper {
 	@Mapping(target = "updatedAt", ignore = true)
 	@Mapping(target = "version", ignore = true)
 	@Mapping(target = "lastFlightEnd", ignore = true)
-	@Mapping(target = "totalFlightHours", ignore = true)
+	@Mapping(target = "totalFlightMinutes", ignore = true)
 	@Mapping(target = "status", ignore = true)
 	void updateEntity(CrewRequest request,@MappingTarget CrewMember entity);
 

@@ -14,6 +14,8 @@ public record FlightResponse(
 		FlightStatus status,
 		LocalDateTime departureTime,
 		LocalDateTime arrivalTime,
-		String gateNumber
-) {
-}
+		LocalDateTime actualDepartureTime,
+		LocalDateTime actualArrivalTime,
+		String gateNumber,
+		LocalDateTime createdAt
+) {}

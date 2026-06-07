@@ -1,6 +1,5 @@
 package az.azal.skyflow.flight.mapper;
 
-
 import az.azal.skyflow.flight.dto.FlightRequest;
 import az.azal.skyflow.flight.dto.FlightResponse;
 import az.azal.skyflow.flight.model.Flight;
@@ -41,6 +40,7 @@ public interface FlightMapper {
 	@Mapping(target = "actualArrivalTime", ignore = true)
 	@Mapping(target = "sequenceOrder", ignore = true)
 	@Mapping(target = "status", ignore = true)
+	@Mapping(target = "flightNumber", ignore = true)
 	void updateEntity(FlightRequest request, @MappingTarget Flight entity);
 
 }

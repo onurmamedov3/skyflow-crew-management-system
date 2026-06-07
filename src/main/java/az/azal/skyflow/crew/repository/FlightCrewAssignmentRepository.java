@@ -78,7 +78,7 @@ public interface FlightCrewAssignmentRepository extends JpaRepository<FlightCrew
 	SET fca.assignmentStatus = :newStatus
 	WHERE fca.crewMember = :crewMember
 	AND fca.assignmentStatus = 'ASSIGNED'
-	AND fca.flight.arrivalTime > :now
+	AND fca.flight.departureTime > :now
 	""")
 	int updateFutureAssignmentStatuses(@Param("crewMember") CrewMember crewMember,
 									  @Param("newStatus") AssignmentStatus newStatus,

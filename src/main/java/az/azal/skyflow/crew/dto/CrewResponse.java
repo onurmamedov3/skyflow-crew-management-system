@@ -15,7 +15,7 @@ public record CrewResponse(
 		String email,
 		String phoneNumber,
 		CrewStatus status,
-		Integer totalFlightHours,
+		Integer totalFlightMinutes,
 		LocalDateTime lastFlightEnd
 ) {
 }

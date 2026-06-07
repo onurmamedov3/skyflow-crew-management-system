@@ -10,34 +10,23 @@ import az.azal.skyflow.flight.dto.FlightResponse;
 import az.azal.skyflow.flight.mapper.FlightMapper;
 import az.azal.skyflow.flight.model.Flight;
 import az.azal.skyflow.flight.model.FlightStatus;
-import az.azal.skyflow.flight.model.FlightStatusHistory;
 import az.azal.skyflow.flight.repository.FlightRepository;
-import az.azal.skyflow.flight.repository.FlightStatusHistoryRepository;
 import az.azal.skyflow.flight.service.FlightService;
+import az.azal.skyflow.flight.service.FlightStatusService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class FlightServiceImpl implements FlightService {
 
-	private static final Map<FlightStatus, Set<FlightStatus>> ALLOWED_TRANSITIONS = Map.of(
-			FlightStatus.SCHEDULED, Set.of(FlightStatus.BOARDING, FlightStatus.DELAYED, FlightStatus.CANCELLED),
-			FlightStatus.DELAYED, Set.of(FlightStatus.BOARDING, FlightStatus.CANCELLED),
-			FlightStatus.BOARDING, Set.of(FlightStatus.IN_FLIGHT),
-			FlightStatus.IN_FLIGHT, Set.of(FlightStatus.ARRIVED)
-	);
-
 	private final FlightRepository flightRepository;
 	private final AircraftRepository aircraftRepository;
 	private final FlightMapper flightMapper;
-	private final FlightStatusHistoryRepository statusHistoryRe;
+	private final FlightStatusService flightStatusService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -52,7 +41,6 @@ public class FlightServiceImpl implements FlightService {
 	public Page<FlightResponse> getAll(Pageable pageable) {
 		return flightRepository.findAll(pageable)
 				.map(flightMapper::toResponse);
-
 	}
 
 	@Override
@@ -80,6 +68,11 @@ public class FlightServiceImpl implements FlightService {
 		Flight flight = flightRepository.findByFlightNumber(flightNumber)
 				.orElseThrow(() -> ResourceNotFoundException.byField("Flight", "flightNumber", flightNumber));
 
+		if (flight.getStatus() == FlightStatus.ARRIVED || flight.getStatus() == FlightStatus.CANCELLED) {
+			throw BusinessRuleViolationException.invalidStatusTransition(
+					flight.getStatus().name(), "UPDATE");
+		}
+
 		flightMapper.updateEntity(request, flight);
 
 		flightRepository.save(flight);
@@ -93,7 +86,7 @@ public class FlightServiceImpl implements FlightService {
 		Flight flight = flightRepository.findByFlightNumber(flightNumber)
 				.orElseThrow(() -> ResourceNotFoundException.byField("Flight", "flightNumber", flightNumber));
 
-		flight.setStatus(FlightStatus.CANCELLED);
+		flightStatusService.changeFlightStatus(flight, FlightStatus.CANCELLED, "SYSTEM", "Flight deleted");
 		flightRepository.save(flight);
 	}
 
@@ -104,27 +97,9 @@ public class FlightServiceImpl implements FlightService {
 		Flight flight = flightRepository.findByFlightNumber(flightNumber)
 				.orElseThrow(() -> ResourceNotFoundException.byField("Flight", "flightNumber", flightNumber));
 
-		Set<FlightStatus> allowedStatuses = ALLOWED_TRANSITIONS.get(flight.getStatus());
-
-		if (allowedStatuses == null || !allowedStatuses.contains(newStatus)) {
-			throw BusinessRuleViolationException.invalidStatusTransition(
-					flight.getStatus().name(),
-					newStatus.name()
-			);
-		}
-
-		FlightStatusHistory statusHistory = new FlightStatusHistory();
-		statusHistory.setFlight(flight);
-		statusHistory.setOldStatus(flight.getStatus());
-		statusHistory.setNewStatus(newStatus);
-		statusHistory.setChangeTime(LocalDateTime.now());
-		statusHistory.setChangeReason(changeReason);
-		statusHistory.setChangedBy("SYSTEM"); //Temporary
-
-		statusHistoryRe.save(statusHistory);
-
-		flight.setStatus(newStatus);
+		flightStatusService.changeFlightStatus(flight, newStatus, "SYSTEM", changeReason);
 		flightRepository.save(flight);
+
 		return flightMapper.toResponse(flight);
 	}
 }

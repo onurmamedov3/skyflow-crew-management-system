@@ -57,14 +57,14 @@ public class FlightDelayServiceImpl implements FlightDelayService {
 		delay.setOriginalDepartureTime(flight.getDepartureTime());
 		delay.setNewDepartureTime(request.newDepartureTime());
 		delay.setNewArrivalTime(newArrivalTime);
-		delay.setHighRisk(delayMinutes > 120);
+		delay.setHighRisk(delayMinutes >= 120);
 		// delay.setReportedBy(delayedBy); // this will be handled after the security is written
 		flightDelayRepository.save(delay);
 
 		flight.setDepartureTime(request.newDepartureTime());
 		flight.setArrivalTime(newArrivalTime);
 
-		flightStatusService.changeFlightStatus(flight, FlightStatus.DELAYED, delayedBy);
+		flightStatusService.changeFlightStatus(flight, FlightStatus.DELAYED, delayedBy, "Delay reason: " + request.reason());
 
 		flightRepository.save(flight);
 
