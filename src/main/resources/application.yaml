@@ -2,6 +2,13 @@ spring:
   application:
     name: skyflow
 
+skyflow:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      access-token-expiration: 900000 # 15 minutes
+      refresh-token-expiration: 604800000 # 7 days
+
   datasource:
     url: jdbc:postgresql://localhost:5432/skyflow
     username: skyflow
