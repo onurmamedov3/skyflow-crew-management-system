@@ -1,5 +1,7 @@
 package az.azal.skyflow.flight.service.impl;
 
+import az.azal.skyflow.auth.model.AppUser;
+import az.azal.skyflow.auth.repository.AppUserRepository;
 import az.azal.skyflow.common.exception.custom.BusinessRuleViolationException;
 import az.azal.skyflow.common.exception.custom.ResourceNotFoundException;
 import az.azal.skyflow.flight.dto.DelayRequest;
@@ -46,6 +48,7 @@ class FlightDelayServiceImplTest {
     @Mock private FlightStatusService flightStatusService;
     @Mock private DelayMapper delayMapper;
     @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private AppUserRepository userRepository;
 
     @InjectMocks
     private FlightDelayServiceImpl flightDelayService;
@@ -71,6 +74,10 @@ class FlightDelayServiceImplTest {
         flight.setDepartureTime(originalDeparture);
         flight.setArrivalTime(originalArrival);
         flight.setStatus(FlightStatus.SCHEDULED);
+
+        AppUser appUser = new AppUser();
+        appUser.setUsername("admin");
+        lenient().when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(appUser));
     }
 
     @Nested
@@ -78,7 +85,7 @@ class FlightDelayServiceImplTest {
     class DelayFlightTests {
 
         @Test
-        @DisplayName("")
+        @DisplayName("Valid request → delay created and times updated")
         void delayFlight_whenValid_shouldCreateDelayAndUpdateTimes(){
 
             LocalDateTime newDeparture = originalDeparture.plusHours(1);
@@ -93,7 +100,7 @@ class FlightDelayServiceImplTest {
             assertThat(result).isNotNull();
             assertThat(result.reason()).isEqualTo(DelayReason.WEATHER);
 
-            verify(flightDelayRepository.save(delayCaptor.capture()));
+            verify(flightDelayRepository).save(delayCaptor.capture());
 
             FlightDelay capturedDelay = delayCaptor.getValue();
 

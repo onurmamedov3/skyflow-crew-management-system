@@ -1,5 +1,7 @@
 package az.azal.skyflow.crew.service.impl;
 
+import az.azal.skyflow.auth.model.AppUser;
+import az.azal.skyflow.auth.repository.AppUserRepository;
 import az.azal.skyflow.common.exception.custom.BusinessRuleViolationException;
 import az.azal.skyflow.common.exception.custom.ResourceNotFoundException;
 import az.azal.skyflow.crew.dto.CrewAssignmentRequest;
@@ -46,6 +48,8 @@ class FlightCrewAssignmentServiceImplTest {
     private FlightCrewAssignmentRepository assignmentRepository;
     @Mock
     private CrewMapper crewMapper;
+    @Mock
+    private AppUserRepository appUserRepository;
 
     @InjectMocks
     private FlightCrewAssignmentServiceImpl service;
@@ -76,6 +80,10 @@ class FlightCrewAssignmentServiceImplTest {
         crewMember.setTotalFlightMinutes(0);
 
         request = new CrewAssignmentRequest(crewMember.getId(), CrewRole.CAPTAIN);
+
+        AppUser appUser = new AppUser();
+        appUser.setUsername("system");
+        lenient().when(appUserRepository.findByUsername("system")).thenReturn(Optional.of(appUser));
     }
 
     @Nested
@@ -99,7 +107,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(assignmentRepository.sumFlightMinutesInWindow(any(), any(), any())).thenReturn(0L);
             when(crewMapper.toAssignmentResponse(any())).thenReturn(expectedResponse);
 
-            CrewAssignmentResponse result = service.assignCrewToFlights(flightId, request);
+            CrewAssignmentResponse result = service.assignCrewToFlights(flightId, request, "system");
 
             assertThat(result).isNotNull();
             assertThat(result.crewMemberId()).isEqualTo(crewMember.getId());
@@ -126,7 +134,7 @@ class FlightCrewAssignmentServiceImplTest {
         void assignCrew_whenFlightNotFound_shouldThrow() {
             when(flightRepository.findById(flightId)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -138,7 +146,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(flightRepository.findById(flightId)).thenReturn(Optional.of(flight));
             when(crewMemberRepository.findById(crewMember.getId())).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -158,7 +166,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(flightRepository.findById(flightId)).thenReturn(Optional.of(flight));
             when(crewMemberRepository.findById(crewMember.getId())).thenReturn(Optional.of(crewMember));
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(BusinessRuleViolationException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -176,7 +184,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(crewMemberRepository.findById(crewMember.getId())).thenReturn(Optional.of(crewMember));
             when(assignmentRepository.existsByFlightAndCrewMember(flight, crewMember)).thenReturn(true);
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(BusinessRuleViolationException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -196,7 +204,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(assignmentRepository.hasTimeConflicts(crewMember, flight.getDepartureTime(), flight.getArrivalTime()))
                     .thenReturn(true);
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(BusinessRuleViolationException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -216,7 +224,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(assignmentRepository.hasTimeConflicts(any(), any(), any())).thenReturn(false);
             when(assignmentRepository.sumFlightMinutesInWindow(any(), any(), any())).thenReturn(540L);
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(BusinessRuleViolationException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -238,7 +246,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(assignmentRepository.sumFlightMinutesInWindow(any(), any(), any())).thenReturn(480L);
             when(crewMapper.toAssignmentResponse(any())).thenReturn(expectedResponse);
 
-            CrewAssignmentResponse result = service.assignCrewToFlights(flightId, request);
+            CrewAssignmentResponse result = service.assignCrewToFlights(flightId, request, "system");
 
             assertThat(result).isNotNull();
 
@@ -257,7 +265,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(assignmentRepository.hasTimeConflicts(any(), any(), any())).thenReturn(false);
             when(assignmentRepository.sumFlightMinutesInWindow(any(), any(), any())).thenReturn(1L);
 
-            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request))
+            assertThatThrownBy(() -> service.assignCrewToFlights(flightId, request, "system"))
                     .isInstanceOf(BusinessRuleViolationException.class);
 
             verify(assignmentRepository, never()).save(any());
@@ -279,7 +287,7 @@ class FlightCrewAssignmentServiceImplTest {
             when(assignmentRepository.sumFlightMinutesInWindow(any(), any(), any())).thenReturn(0L);
             when(crewMapper.toAssignmentResponse(any())).thenReturn(expectedResponse);
 
-            CrewAssignmentResponse result = service.assignCrewToFlights(flightId, request);
+            CrewAssignmentResponse result = service.assignCrewToFlights(flightId, request, "system");
 
             assertThat(result).isNotNull();
 

@@ -100,6 +100,8 @@ class CrewStatusServiceImplTest {
             when(crewMemberRepository.findById(crewId)).thenReturn(Optional.of(crewMember));
             when(crewMapper.toResponse(crewMember)).thenReturn(expectedResponse);
 
+            CrewResponse result = crewStatusService.updateCrewStatus(crewId, CrewStatus.AVAILABLE, "admin");
+
             verify(crewMemberRepository).save(crewCaptor.capture());
 
             assertThat(crewCaptor.getValue().getStatus()).isEqualTo(CrewStatus.AVAILABLE);
